@@ -99,8 +99,8 @@ def get_idxs(df, time_steps):
     successive time point in the sample being 1 hour apart
     """
     
-    array = np.array(np.array(df.date_time.values[1:] - 
-                              df.date_time.values[:-1],
+    array = np.array(np.array(df.index.values[1:] - 
+                              df.index.values[:-1],
                               dtype='timedelta64[s]'),
                      np.float32)
     
