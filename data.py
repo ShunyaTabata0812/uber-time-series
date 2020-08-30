@@ -98,13 +98,19 @@ def get_idxs(df, time_steps):
     Get starting indices for samples with length `time_steps` with each
     successive time point in the sample being 1 hour apart
     """
-    shape = [len(df)-time_steps+1, time_steps]
-    strides = (df.index.strides[0],df.index.strides[0]*time_steps)
-    datetimes_strided = np.lib.stride_tricks.as_strided(df.index, shape=shape, strides=(8,8))
-    ends,starts = datetimes_strided[:,[-1,0]].T
-    idxs = np.where(ends-starts == np.timedelta64((time_steps-1)*60*60*int(1e9), 'ns'))[0]
+    
+    array = np.array(np.array(df.date_time.values[1:] - 
+                              df.date_time.values[:-1],
+                              dtype='timedelta64[s]'),
+                     np.float32)
+    
+    idxs = []
+    for i,_ in enumerate(array[:-time_steps]):
+        if np.all(array[i:i+25]==3600):
+            idxs.append(i)
+    return np.array(idxs)
 
-    return idxs
+
 
 
 def samples(df, time_steps=24, y_time_steps=12):
